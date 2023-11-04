@@ -1,10 +1,4 @@
 import {
-    Edge,
-    EdgeChange,
-    Node,
-    NodeChange,
-    OnNodesChange,
-    OnEdgesChange,
     applyNodeChanges,
     applyEdgeChanges,
   } from 'reactflow';
@@ -16,7 +10,7 @@ import {
       {
         id: 'root',
         type: 'apiRoot',
-        data: { label: 'React Flow Mind Map' },
+        data: { path: "/api" },
         position: { x: 0, y: 0 },
       },
     ],
@@ -52,6 +46,26 @@ import {
         edges: [...get().edges, newEdge],
       });
     },
+    save: (fileName) => {
+      function download(filename, text) {
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
+      
+        element.style.display = 'none';
+        document.body.appendChild(element);
+      
+        element.click();
+      
+        document.body.removeChild(element);
+      }
+      var saveBlob = new Blob([JSON.stringify({nodes: nodes, edges: edges})], {
+        type: 'application/json'
+      });
+      download("api.json", saveBlob);
+    },
+    load: (fileName) => {
+    }
   }));
    
   export default useStore;
