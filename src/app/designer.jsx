@@ -16,6 +16,7 @@ import useStore from './store';
 import 'reactflow/dist/style.css';
 import { ApiElement } from './nodes/api_element';
 import { ApiRoot } from './nodes/api_root';
+import EditorToolbox from './EditorToolbox';
 
 
 const selector = (state) => ({
@@ -24,6 +25,9 @@ const selector = (state) => ({
   onNodesChange: state.onNodesChange,
   onEdgesChange: state.onEdgesChange,
   addChildNode: state.addChildNode,
+  save: state.save,
+  load: state.load,
+  updateElementData: state.updateElementData,
 });
 const nodeOrigin = [0.5, 0.5];
 
@@ -34,10 +38,11 @@ export default function Designer() {
 
   const { project } = useReactFlow();
   const store = useStoreApi();
-  const { nodes, edges, onNodesChange, onEdgesChange, addChildNode } = useStore(
+  const { nodes, edges, onNodesChange, onEdgesChange, addChildNode, updateElementData, save, load } = useStore(
     selector,
     shallow
   );
+
 
   const connectingNodeId = useRef(null);
 
@@ -98,8 +103,19 @@ export default function Designer() {
     [addChildNode, project, store]
   );
 
+  function saveMap(filename) {
+    console.log("Saving map");
+    save(filename, nodes, edges);
+  }
+
+  function loadMap(file) {
+    console.log("Loading map");
+    load(file);
+    console.log("Loaded map");
+  }
 
 
+  console.log("Rendering Designer");
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
       <ReactFlow 
@@ -115,6 +131,7 @@ export default function Designer() {
               snapToGrid
               snapGrid={[28, 28]}
               fitView >
+          <EditorToolbox saveFn={saveMap} loadFn={loadMap} />
           <Controls />
           <Background />
       </ReactFlow>
