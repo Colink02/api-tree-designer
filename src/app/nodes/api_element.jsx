@@ -1,8 +1,11 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Handle, Position } from "reactflow";
+import useStore from "../store";
 import ContentEditable from "react-contenteditable";
 
-export function ApiElement({ data, isConnectable, selected }) {
+export function ApiElement({ id, data, isConnectable, selected }) {
+  const updateElementData = useStore((state) => state.updateElementData);
+  console.log(data);
   const headerRef = useRef(null);
   const dropdownRef = useRef(null);
   // The Path name (e.g. /api/v1/test would be "test" with parent of v1)
@@ -13,6 +16,14 @@ export function ApiElement({ data, isConnectable, selected }) {
   const [description, setDescription] = useState(data?.description);
 
   const handleApiPathChange = (event) => setApiPath(event.target.value);
+
+  useEffect(() => {
+    updateElementData(id, {
+      path: apiPath,
+      method: apiMethod,
+      description: description,
+    });
+  }, [apiPath, apiMethod, description, updateElementData, id]);
 
   const focusHeader = () => {
     if (selected) {

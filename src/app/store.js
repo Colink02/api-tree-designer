@@ -1,6 +1,7 @@
 import {
     applyNodeChanges,
     applyEdgeChanges,
+    useUpdateNodeInternals,
   } from 'reactflow';
   import { createWithEqualityFn } from 'zustand/traditional';
   import { nanoid } from 'nanoid/non-secure';
@@ -29,7 +30,7 @@ import {
       const newNode = {
         id: nanoid(),
         type: 'apiNode',
-        data: { label: 'New Node' },
+        data: { path: "", method: "GET" },
         position,
         // dragHandle: '.dragHandle',
         parentNode: parentNode.id,
@@ -46,10 +47,20 @@ import {
         edges: [...get().edges, newEdge],
       });
     },
-    save: (fileName) => {
+    updateElementData: (nodeId, data) => {
+      set({
+        nodes: get().nodes.map((node) => {
+          if(node.id === nodeId) {
+            node.data = data;
+          }
+          return node;
+        }),
+      });
+    },
+    save: (fileName, nodes, edges) => {
       function download(filename, text) {
         var element = document.createElement('a');
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('href', URL.createObjectURL(text));
         element.setAttribute('download', filename);
       
         element.style.display = 'none';
@@ -59,12 +70,23 @@ import {
       
         document.body.removeChild(element);
       }
-      var saveBlob = new Blob([JSON.stringify({nodes: nodes, edges: edges})], {
+      console.log(nodes, edges);
+      const saveBlob = new Blob([JSON.stringify({nodes: nodes, edges: edges})], {
         type: 'application/json'
       });
-      download("api.json", saveBlob);
+      download(fileName, saveBlob);
     },
-    load: (fileName) => {
+    load: (file) => {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const contents = e.target.result;
+        const json = JSON.parse(contents);
+        set({
+          nodes: json.nodes,
+          edges: json.edges,
+        });
+      }
+      reader.readAsText(file);
     }
   }));
    
