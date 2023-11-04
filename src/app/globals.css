@@ -41,3 +41,12 @@ body {
 .dropdown-trigger:hover {
   background-color: aqua;
 }
+.toolbox {
+  background-color: #5d6969;
+  padding: 10px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 4;
+  border-bottom-left-radius: 5px;
+}
